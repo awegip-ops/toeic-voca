@@ -99,3 +99,11 @@ const fail = (err) => {
 };
 
 start().catch((err) => (err.locked ? showUnlock(err.message) : fail(err)));
+
+// PC 실행기(tools/serve.mjs)로 열었을 때만: 창이 열려 있는 동안 서버에 주기적으로 '살아 있음' 신호를 보내
+// 창을 닫으면 서버가 스스로 종료되게 함. (GitHub Pages 등 다른 곳에서는 보내지 않음)
+if (/^(localhost|127\.0\.0\.1|\[::1\]|(10|192\.168|172\.(1[6-9]|2\d|3[01]))\.[\d.]+)$/.test(location.hostname) && location.port) {
+  const ping = () => fetch("__alive", { cache: "no-store" }).catch(() => {});
+  ping();
+  setInterval(ping, 20000);
+}
