@@ -1,0 +1,109 @@
+// DOM/저장소에 의존하지 않는 순수 함수 모음 (node 테스트 대상)
+
+export function esc(str) {
+  if (str == null) return "";
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+export function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// 표제어 속 단어를 본문에서 굵게 표시하기 위한 정규식 (활용형도 잡도록 어미를 조금 깎아서 접두어 매칭)
+function headwordPattern(headword) {
+  const prefixes = (headword.match(/[A-Za-z]+/g) || [])
+    .filter((t) => t.length >= 3)
+    .map((t) => (t.length > 5 ? t.slice(0, t.length - 2) : t.length === 5 ? t.slice(0, 4) : t));
+  if (!prefixes.length) return null;
+  return new RegExp("\\b(" + prefixes.join("|") + ")[a-z']*", "gi");
+}
+
+// 영어 문장 안의 표제어(활용형 포함)를 <b>로 강조한 HTML
+export function boldHeadword(text, headword) {
+  const safe = esc(text);
+  const re = headwordPattern(headword);
+  return re ? safe.replace(re, (m) => `<b class="hw">${m}</b>`) : safe;
+}
+
+const BLANK = "-------";
+
+// 원서 빈칸 문제: 빈칸을 밑줄 칸으로 바꾼 HTML. answer 를 주면 정답을 채워서 보여 줌
+export function blankHtml(stem, answer) {
+  const parts = esc(stem).split(BLANK);
+  const fill = answer == null ? `<span class="blank"></span>` : `<span class="filled">${esc(answer)}</span>`;
+  return parts.join(fill);
+}
+
+// 동의어 문제: 밑줄 단어를 <mark>로 표시한 HTML
+export function markHtml(stem, highlight) {
+  const safe = esc(stem);
+  const h = esc(highlight);
+  const i = safe.indexOf(h);
+  return i < 0 ? safe : safe.slice(0, i) + `<mark>${h}</mark>` + safe.slice(i + h.length);
+}
+
+// "~", "A" 같은 자리표시 기호는 읽어 주지 않도록 정리한 TTS용 문장
+export function speakable(text) {
+  return String(text).replace(/\[[^\]]*\]/g, "").replace(/~/g, "").replace(/\s+/g, " ").trim();
+}
+
+// 뜻 맞추기: 표제어를 보고 알맞은 한국어 뜻 고르기 (오답은 같은 Day 단어 우선)
+export function makeMeaningQuestion(word, sameDay, everyone) {
+  const seen = new Set([word.meaning]);
+  // 뜻이 같은 단어(예: 같은 뜻의 다른 표제어)는 오답 후보에서 제외해 선택지가 겹치지 않게 함
+  const ok = (w) => w.id !== word.id && w.meaning && !seen.has(w.meaning);
+  const picked = [];
+  for (const pool of [shuffle(sameDay), shuffle(everyone)]) {
+    for (const w of pool) {
+      if (picked.length >= 3) break;
+      if (ok(w)) {
+        picked.push(w);
+        seen.add(w.meaning);
+      }
+    }
+  }
+  const choices = shuffle([word, ...picked]).map((w) => ({ text: w.meaning, correct: w.id === word.id }));
+  return { kind: "meaning", word, choices };
+}
+
+// 원서 문제: 책에 실린 Part 5·6 빈칸 / Part 7 동의어 문제
+export const quizzesOf = (word) => word.quizzes || (word.quiz ? [word.quiz] : []);
+
+export function makeBookQuestion(word, q = word.quiz) {
+  if (!q) return null;
+  const kind = q.highlight ? "synonym" : "blank";
+  const choices = shuffle(q.choices).map((text) => ({ text, correct: text === q.answer }));
+  if (choices.filter((c) => c.correct).length !== 1) return null; // 데이터 이상은 출제하지 않음
+  return { kind, word, choices, quiz: q };
+}
+
+// 플래시카드 세션 큐: 기본은 번호 순서, 섞기 옵션 지원
+export function buildStudyQueue(words, { shuffled = false } = {}) {
+  return shuffled ? shuffle(words) : words.slice().sort((a, b) => a.day - b.day || a.no - b.no);
+}
+
+// 두 기기의 복습 기록 병합: 단어별로 복습 횟수가 많은 쪽(같으면 더 최근) 유지
+export function mergeSrs(local, remote, validIds) {
+  const merged = { ...local };
+  let changed = 0;
+  for (const [id, r] of Object.entries(remote || {})) {
+    if (!validIds.has(id) || !r || typeof r.box !== "number") continue;
+    const c = merged[id];
+    const rc = r.reviewCount || 0;
+    const cc = c ? c.reviewCount || 0 : -1;
+    if (!c || rc > cc || (rc === cc && (r.lastReviewed || "") > (c.lastReviewed || ""))) {
+      merged[id] = r;
+      changed++;
+    }
+  }
+  return { merged, changed };
+}
+
+export const POS_LABEL = { n: "명사", v: "동사", adj: "형용사", adv: "부사", prep: "전치사", conj: "접속사", phr: "구", a: "형용사", ad: "부사" };
+// "n/v" 같은 복합 품사를 "명사·동사" 로
+export const posText = (pos) => (pos || "").split("/").map((p) => POS_LABEL[p] || p).join("·");

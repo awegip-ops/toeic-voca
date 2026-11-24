@@ -1,0 +1,402 @@
+[
+{
+"week": 1,
+"day": 1,
+"part": "P1",
+"partLabel": "Part 1",
+"kind": "photo",
+"title": "사람 사진 빈출 어휘",
+"available": true,
+"count": 40
+},
+{
+"week": 1,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "명사 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 1,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "명사 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 1,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 1,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "synonym",
+"title": "기출 동의어 ①",
+"available": true,
+"count": 30
+},
+{
+"week": 2,
+"day": 1,
+"part": "P1",
+"partLabel": "Part 1",
+"kind": "photo",
+"title": "사물 사진 빈출 어휘",
+"available": true,
+"count": 40
+},
+{
+"week": 2,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "명사 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 2,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "명사 ④",
+"available": true,
+"count": 40
+},
+{
+"week": 2,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 2,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "synonym",
+"title": "기출 동의어 ②",
+"available": true,
+"count": 30
+},
+{
+"week": 3,
+"day": 1,
+"part": "P24",
+"partLabel": "Part 2~4",
+"kind": "lc",
+"title": "LC가 잘 들리는 어휘 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 3,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "동사 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 3,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "동사 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 3,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 3,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "synonym",
+"title": "기출 동의어 ③",
+"available": true,
+"count": 30
+},
+{
+"week": 4,
+"day": 1,
+"part": "P24",
+"partLabel": "Part 2~4",
+"kind": "lc",
+"title": "LC가 잘 들리는 어휘 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 4,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "동사 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 4,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "동사 ④",
+"available": true,
+"count": 40
+},
+{
+"week": 4,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 4,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "synonym",
+"title": "기출 동의어 ④",
+"available": true,
+"count": 30
+},
+{
+"week": 5,
+"day": 1,
+"part": "P24",
+"partLabel": "Part 2~4",
+"kind": "lc",
+"title": "LC가 잘 들리는 어휘 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 5,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "형용사 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 5,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "형용사 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 5,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 5,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "reading",
+"title": "독해가 쉬워지는 어휘 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 6,
+"day": 1,
+"part": "P34",
+"partLabel": "Part 3·4",
+"kind": "para",
+"title": "기출 패턴 패러프레이징 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 6,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "형용사 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 6,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "형용사 ④",
+"available": true,
+"count": 40
+},
+{
+"week": 6,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 6,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "reading",
+"title": "독해가 쉬워지는 어휘 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 7,
+"day": 1,
+"part": "P34",
+"partLabel": "Part 3·4",
+"kind": "para",
+"title": "기출 패턴 패러프레이징 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 7,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "부사 ①",
+"available": true,
+"count": 40
+},
+{
+"week": 7,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "부사 ②",
+"available": true,
+"count": 40
+},
+{
+"week": 7,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "colloc",
+"title": "콜로케이션",
+"available": true,
+"count": 40
+},
+{
+"week": 7,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "reading",
+"title": "독해가 쉬워지는 어휘 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 8,
+"day": 1,
+"part": "P34",
+"partLabel": "Part 3·4",
+"kind": "para",
+"title": "기출 패턴 패러프레이징 ③",
+"available": true,
+"count": 40
+},
+{
+"week": 8,
+"day": 2,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "전치사",
+"available": true,
+"count": 40
+},
+{
+"week": 8,
+"day": 3,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "다품사",
+"available": true,
+"count": 40
+},
+{
+"week": 8,
+"day": 4,
+"part": "P56",
+"partLabel": "Part 5·6",
+"kind": "word",
+"title": "다의어",
+"available": true,
+"count": 40
+},
+{
+"week": 8,
+"day": 5,
+"part": "P7",
+"partLabel": "Part 7",
+"kind": "reading",
+"title": "독해가 쉬워지는 어휘 ④",
+"available": true,
+"count": 40
+}
+]
