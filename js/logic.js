@@ -204,12 +204,37 @@ export function listenText(w) {
   return { en, ko };
 }
 
-export function buildListenSteps(w, { example = true, repeatWord = true } = {}) {
+// 한 단어에 딸린 예문 전부: [{ en, ko }] (한글 해석이 없는 문장은 ko 가 빈 문자열)
+export function listenExamples(w) {
+  const list = [];
+  const seen = new Set();
+  const add = (en, ko = "") => {
+    const key = String(en).trim().toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    list.push({ en: String(en).trim(), ko: String(ko || "").trim() });
+  };
+  for (const c of (w.colloc || []).slice().sort((a, b) => Number(b.exam) - Number(a.exam))) add(c.en, c.ko);
+  for (const q of w.quizzes || (w.quiz ? [w.quiz] : [])) {
+    if (q.highlight) add(q.stem, q.translation_kr);
+    else if (q.answer && q.stem.includes("-------")) add(q.stem.replace("-------", q.answer));
+  }
+  for (const d of w.dialogue || []) add(d.en, d.ko);
+  for (const x of w.examples || []) add(x.en, x.ko);
+  return list;
+}
+
+// examples: 'all'(전부) | 'one'(첫 문장만) | 'off', exampleKo: 예문 뜻도 읽을지
+export function buildListenSteps(w, { examples = "all", exampleKo = true, repeatWord = true } = {}) {
   const { en, ko } = listenText(w);
-  const steps = [{ text: en, lang: "en-US", gap: 0.7 }];
-  if (ko) steps.push({ text: ko, lang: "ko-KR", gap: 0.7 });
-  const ex = example ? exampleSentence(w) : null;
-  if (ex) steps.push({ text: ex, lang: "en-US", gap: 1.0 });
-  if (repeatWord && ex) steps.push({ text: en, lang: "en-US", gap: 0.5 });
+  const steps = [{ text: en, lang: "en-US", gap: 0.7, part: "word" }];
+  if (ko) steps.push({ text: ko, lang: "ko-KR", gap: 0.8, part: "meaning" });
+  let list = examples === "off" ? [] : listenExamples(w);
+  if (examples === "one") list = list.slice(0, 1);
+  list.forEach((ex, n) => {
+    steps.push({ text: ex.en, lang: "en-US", gap: exampleKo && ex.ko ? 0.6 : 1.0, part: "example", ex: n });
+    if (exampleKo && ex.ko) steps.push({ text: ex.ko, lang: "ko-KR", gap: 1.0, part: "example-ko", ex: n });
+  });
+  if (repeatWord && list.length) steps.push({ text: en, lang: "en-US", gap: 0.5, part: "word" });
   return steps;
 }

@@ -1,12 +1,13 @@
 // 듣기 모드(자동재생): 단어(영) → 뜻(한) → 예문(영) → 단어(영)를 화면을 보지 않고 계속 들을 수 있게 재생.
 // 운전 중에는 화면을 보지 말고 소리만 들으세요. 시작 버튼만 정차 중에 누르면 됩니다.
 import { state, dayWords, dayInfo, buildReviewQueue, saveSettings } from "../store.js";
-import { esc, shuffle, buildListenSteps, listenText, exampleSentence } from "../logic.js";
+import { esc, shuffle, buildListenSteps, listenText, listenExamples } from "../logic.js";
 import { shell } from "../ui.js";
 import { speakAsync, stopSpeaking, ttsSupported, hasVoice } from "../tts.js";
 
 const POS_KEY = "toeicVoca2.listenPos";
-const DEFAULTS = { shuffle: false, loop: true, example: true, pace: 1, wake: true };
+const DEFAULTS = { shuffle: false, loop: true, examples: "all", exampleKo: true, pace: 1, wake: true };
+const EX_LABEL = { all: "예문 전체", one: "예문 1개", off: "예문 끔" };
 const RATES = [[0.8, "느리게"], [0.95, "보통"], [1.1, "빠르게"]];
 
 const readPos = () => {
@@ -93,7 +94,7 @@ export function listen(root, [scope]) {
         </div>
         ${started ? "" : `<p class="l-note">▶를 누르면 자동으로 이어서 들려줘요. 운전 중에는 화면을 보지 말고 소리만 들으세요.${ttsSupported() ? "" : "<br>이 브라우저는 음성 읽기를 지원하지 않아요."}${hasVoice("ko-KR") ? "" : "<br>한국어 음성이 없어 뜻을 읽지 못할 수 있어요."}</p>`}
         <div class="l-opts">
-          ${chip("oShuffle", opts.shuffle, "🔀 섞기")}${chip("oLoop", opts.loop, "🔁 반복")}${chip("oEx", opts.example, "💬 예문")}${chip("oWake", opts.wake, "☀️ 화면 켜두기")}
+          ${chip("oShuffle", opts.shuffle, "🔀 섞기")}${chip("oLoop", opts.loop, "🔁 반복")}${chip("oEx", opts.examples !== "off", "💬 " + EX_LABEL[opts.examples])}${chip("oExKo", opts.exampleKo && opts.examples !== "off", "🈶 예문 뜻")}${chip("oWake", opts.wake, "☀️ 화면 켜두기")}
           <button class="lchip" id="oRate">🐢 ${speedLabel()}</button>
           <button class="lchip" id="oPace">⏱ 간격 ${opts.pace === 1 ? "보통" : opts.pace > 1 ? "길게" : "짧게"}</button>
         </div>
@@ -105,9 +106,26 @@ export function listen(root, [scope]) {
 
   const stageHtml = (w) => {
     const { en, ko } = listenText(w);
-    const ex = opts.example ? exampleSentence(w) : null;
-    return `<p class="l-en" id="lw">${esc(en)}</p><p class="l-ko" id="lm">${esc(ko)}</p>${ex ? `<p class="l-ex" id="lx">${esc(ex)}</p>` : ""}`;
+    let list = opts.examples === "off" ? [] : listenExamples(w);
+    if (opts.examples === "one") list = list.slice(0, 1);
+    const items = list
+      .map((x, n) => `<li data-ex="${n}"><p class="en">${esc(x.en)}</p>${x.ko ? `<p class="ko">${esc(x.ko)}</p>` : ""}</li>`)
+      .join("");
+    return `<p class="l-en" id="lw">${esc(en)}</p><p class="l-ko" id="lm">${esc(ko)}</p>${items ? `<ul class="l-exlist">${items}</ul>` : ""}`;
   };
+
+  // 지금 읽고 있는 예문을 강조하고 화면 안으로 스크롤
+  function highlight(st) {
+    const stage = root.querySelector("#stage");
+    if (!stage) return;
+    stage.querySelectorAll(".now").forEach((el) => el.classList.remove("now", "now-ko"));
+    if (st.ex === undefined) return;
+    const li = stage.querySelector(`[data-ex="${st.ex}"]`);
+    if (!li) return;
+    li.classList.add("now");
+    if (st.part === "example-ko") li.classList.add("now-ko");
+    li.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
 
   function showWord() {
     const w = queue[index];
@@ -149,8 +167,9 @@ export function listen(root, [scope]) {
       showWord();
       savePos();
       const w = queue[index];
-      for (const st of buildListenSteps(w, { example: opts.example })) {
+      for (const st of buildListenSteps(w, { examples: opts.examples, exampleKo: opts.exampleKo })) {
         if (my !== gen) return;
+        highlight(st);
         await speakAsync(st.text, st.lang, st.lang === "ko-KR" ? Math.min(state.settings.rate + 0.05, 1.15) : state.settings.rate);
         if (my !== gen) return;
         await sleep(st.gap * opts.pace * 1000, my);
@@ -239,15 +258,18 @@ export function listen(root, [scope]) {
     if (id === "toggle") toggle();
     else if (id === "next") go(1);
     else if (id === "prev") go(-1);
-    else if (["oShuffle", "oLoop", "oEx", "oWake"].includes(id)) {
-      const key = { oShuffle: "shuffle", oLoop: "loop", oEx: "example", oWake: "wake" }[id];
-      opts[key] = !opts[key];
-      persistOpts();
-      if (key === "shuffle") {
-        queue = opts.shuffle ? shuffle(sc.words) : sc.words.slice();
-        index = 0;
+    else if (["oShuffle", "oLoop", "oEx", "oExKo", "oWake"].includes(id)) {
+      if (id === "oEx") opts.examples = { all: "one", one: "off", off: "all" }[opts.examples];
+      else {
+        const key = { oShuffle: "shuffle", oLoop: "loop", oExKo: "exampleKo", oWake: "wake" }[id];
+        opts[key] = !opts[key];
+        if (key === "shuffle") {
+          queue = opts.shuffle ? shuffle(sc.words) : sc.words.slice();
+          index = 0;
+        }
+        if (key === "wake") opts.wake ? acquireLock() : releaseLock();
       }
-      if (key === "wake") opts.wake ? acquireLock() : releaseLock();
+      persistOpts();
       const wasPlaying = playing;
       draw();
       if (wasPlaying) playFrom(index);
