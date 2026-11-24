@@ -28,13 +28,14 @@ export function home(root) {
     const seen = ready.reduce((n, d) => n + dayStats(d.week, d.day).seen, 0);
     const sum = ready.length ? `${seen}/${total}단어 학습` : "준비 중";
     return `<details class="week"${open}><summary><span class="w-name">Week ${wk}</span><span class="w-sum">${sum}</span></summary>
-      <div class="days">${days.map(dayRow).join("")}</div></details>`;
+      <div class="days">${days.map(dayRow).join("")}${ready.length ? `<a class="week-listen" href="#/listen/week-${wk}">🎧 Week ${wk} 전체 이어 듣기</a>` : ""}</div></details>`;
   }).join("");
 
   const hero = info.total
     ? `<p class="hero-n"><b>${info.total}</b>개 학습 중 · 약한 단어 <b>${info.weak}</b>개</p>
        <p class="hero-s">오늘 ${st.todayReviewed || 0}번 학습했어요</p>
-       <a class="btn light" href="#/study/review">복습 시작</a>`
+       <a class="btn light" href="#/study/review">복습 시작</a>
+       <div class="hero-row"><a class="btn hero-sub" href="#/listen/review">🎧 복습 듣기</a><a class="btn hero-sub" href="#/typing/review">⌨️ 복습 타이핑</a></div>`
     : `<p class="hero-n">아직 학습한 단어가 없어요</p>
        <p class="hero-s">아래에서 Day를 골라 카드 학습을 시작해 보세요</p>
        <a class="btn light" href="#/day/1/1">Week 1 · Day 1 시작</a>`;

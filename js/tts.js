@@ -36,3 +36,37 @@ export function speak(text, { lang = "en-US" } = {}) {
 export function stopSpeaking() {
   if (ttsSupported()) window.speechSynthesis.cancel();
 }
+
+// ---- 듣기 모드용: 끝날 때까지 기다리는 읽기 ----
+function pickVoiceFor(lang) {
+  if (lang.startsWith("en")) return pickEnglishVoice();
+  const prefix = lang.slice(0, 2);
+  return voices.find((v) => v.lang && v.lang.toLowerCase().startsWith(prefix)) || null;
+}
+
+// 읽기가 끝나면 resolve. 일부 브라우저는 onend 를 빼먹으므로 글자 수에 비례한 안전 타이머를 둠
+export function speakAsync(text, lang = "en-US", rate = 1) {
+  return new Promise((resolve) => {
+    if (!ttsSupported()) return resolve();
+    const clean = speakable(text);
+    if (!clean) return resolve();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = lang;
+    u.rate = rate;
+    const v = pickVoiceFor(lang);
+    if (v) u.voice = v;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(finish, Math.max(3000, (clean.length * 260) / rate) + 2500);
+    u.onend = finish;
+    u.onerror = finish;
+    window.speechSynthesis.speak(u);
+  });
+}
+
+export const hasVoice = (lang) => !ttsSupported() || !!pickVoiceFor(lang);

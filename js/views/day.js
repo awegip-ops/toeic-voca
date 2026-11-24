@@ -34,6 +34,8 @@ export function day(root, [wk, dy]) {
        <a class="act" href="#/quiz/${scope}/meaning"><span>✍️</span>뜻 맞추기</a>
        ${hasBook ? `<a class="act" href="#/quiz/${scope}/book"><span>📖</span>원서 문제</a>` : ""}
        <a class="act" href="#/study/${scope}/shuffle"><span>🔀</span>섞어서 카드</a>
+       <a class="act" href="#/listen/${scope}"><span>🎧</span>듣기 (자동재생)</a>
+       <a class="act" href="#/typing/${scope}"><span>⌨️</span>타이핑 학습</a>
      </section>
      <div class="list-head"><h2 class="sec">단어 ${words.length}개</h2>
        <label class="switch"><input type="checkbox" id="hide" ${state.settings.hideMeaning ? "checked" : ""}> 뜻 가리기</label></div>

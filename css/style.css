@@ -248,3 +248,46 @@ mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 4px
 .qa .a { font-size: 15.5px; font-weight: 700; color: var(--ok); }
 .q-stem + .choices.inline { margin-top: 10px; }
 .book-q + .book-q { margin-top: 4px; }
+
+/* ---------- 듣기(자동재생) ---------- */
+.hero-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.hero-sub { background: rgba(255, 255, 255, .16); color: #fff; font-size: 14px; }
+.week-listen { display: block; text-align: center; padding: 12px; font-weight: 700; color: var(--primary); border-top: 1px solid var(--border); }
+.listen { padding-top: 4px; }
+.l-top { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+.l-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.l-title b { font-size: 16px; } .l-title span { font-size: 12.5px; color: var(--muted); }
+.l-count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.l-progress { height: 6px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+.l-progress u { display: block; height: 100%; background: var(--primary); transition: width .3s; }
+.l-stage { min-height: 280px; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 14px; padding: 26px 8px; }
+.l-en { font-size: clamp(34px, 9vw, 54px); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; word-break: break-word; }
+.l-ko { font-size: clamp(22px, 5.5vw, 30px); font-weight: 700; color: var(--primary); }
+.l-ex { font-size: clamp(17px, 4vw, 21px); color: var(--muted); line-height: 1.6; }
+.l-ctrl { display: flex; justify-content: center; align-items: center; gap: 22px; margin: 6px 0 14px; }
+.lbtn { width: 68px; height: 68px; border-radius: 50%; border: 0; background: var(--surface); box-shadow: var(--shadow); border: 1px solid var(--border); font-size: 26px; }
+.lbtn.big { width: 96px; height: 96px; font-size: 40px; background: var(--primary); color: #fff; border: 0; }
+.l-note { text-align: center; font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0 8px 12px; }
+.l-opts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding-bottom: 8px; }
+.lchip { border: 1px solid var(--border); background: var(--surface); border-radius: 99px; padding: 9px 14px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.lchip.on { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+
+/* ---------- 타이핑 ---------- */
+.t-modes { display: grid; gap: 10px; margin-top: 10px; }
+.t-mode { display: flex; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+.t-mode:hover { border-color: var(--primary); }
+.t-ico { font-size: 28px; }
+.t-mode b { font-size: 17px; } .t-mode p { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.t-card { min-height: 150px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+.t-ko { font-size: 28px; font-weight: 800; line-height: 1.4; }
+.t-word { font-size: 32px; font-weight: 800; }
+.t-hint { font-size: 15px; color: var(--muted); }
+.t-ex { font-size: 16px; color: var(--text); margin-top: 4px; }
+.t-cloze { font-size: 20px; line-height: 1.8; text-align: left; }
+.t-form { display: grid; gap: 10px; margin-top: 14px; }
+.t-input { border: 2px solid var(--border); background: var(--surface); color: var(--text); border-radius: 14px; padding: 16px; font: inherit; font-size: 22px; width: 100%; }
+.t-input:focus { outline: none; border-color: var(--primary); }
+.t-msg { min-height: 28px; font-size: 16px; font-weight: 600; }
+.t-msg.ok { color: var(--ok); } .t-msg.bad { color: var(--bad); } .t-msg.warn { color: var(--warn); }
+.t-full { font-weight: 500; color: var(--muted); font-size: 15px; }
+.t-btns { display: flex; gap: 8px; } .t-btns .btn { flex: 1; } .t-btns .btn.primary { flex: 2; }

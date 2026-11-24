@@ -14,20 +14,13 @@ export function shuffle(arr) {
   return a;
 }
 
-// 표제어 속 단어를 본문에서 굵게 표시하기 위한 정규식 (활용형도 잡도록 어미를 조금 깎아서 접두어 매칭)
-function headwordPattern(headword) {
-  const prefixes = (headword.match(/[A-Za-z]+/g) || [])
-    .filter((t) => t.length >= 3)
-    .map((t) => (t.length > 5 ? t.slice(0, t.length - 2) : t.length === 5 ? t.slice(0, 4) : t));
-  if (!prefixes.length) return null;
-  return new RegExp("\\b(" + prefixes.join("|") + ")[a-z']*", "gi");
-}
-
 // 영어 문장 안의 표제어(활용형 포함)를 <b>로 강조한 HTML
 export function boldHeadword(text, headword) {
   const safe = esc(text);
-  const re = headwordPattern(headword);
-  return re ? safe.replace(re, (m) => `<b class="hw">${m}</b>`) : safe;
+  const base = headwordRegex(headword);
+  if (!base) return safe;
+  const re = new RegExp(base.source, "gi");
+  return safe.replace(re, (m) => `<b class="hw">${m}</b>`);
 }
 
 const BLANK = "-------";
@@ -107,3 +100,116 @@ export function mergeSrs(local, remote, validIds) {
 export const POS_LABEL = { n: "명사", v: "동사", adj: "형용사", adv: "부사", prep: "전치사", conj: "접속사", phr: "구", a: "형용사", ad: "부사" };
 // "n/v" 같은 복합 품사를 "명사·동사" 로
 export const posText = (pos) => (pos || "").split("/").map((p) => POS_LABEL[p] || p).join("·");
+
+// ======================= 타이핑 학습 =======================
+const HANGUL = /[가-힣ㄱ-ㅎㅏ-ㅣ]/;
+export const hasHangul = (s) => HANGUL.test(s);
+
+// 표제어에서 '쳐야 할 영어'를 뽑음: 한글 설명·자리표시(+, ~, A, B, -ing)·[괄호 선택]을 정리하고
+// "hall/street" 같은 대체 표기는 모든 경우를 허용
+export function typingTargets(headword) {
+  const base = headword
+    .replace(/\[[^\]]*\]/g, " ") // [duties/tasks] 같은 선택 표기는 제외
+    .replace(/\(([^)]*)\)/g, "$1") // (cash) register → cash register
+    .replace(/[가-힣]+/g, " ")
+    .replace(/[+~]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t && !/^-?ing$/i.test(t));
+  let variants = [[]];
+  for (const tok of base) {
+    const opts = /^[A-Za-z']+(\/[A-Za-z']+)+$/.test(tok) ? tok.split("/") : [tok];
+    variants = variants.flatMap((v) => opts.map((o) => [...v, o])).slice(0, 8);
+  }
+  return [...new Set(variants.map((v) => v.join(" ")))].filter(Boolean);
+}
+
+// 비교용 정규화: 대소문자·공백·구두점·하이픈·자리표시(단독 A/B) 무시
+export function normTyping(s) {
+  return String(s)
+    .split(/\s+/)
+    .filter((t) => !/^[AB]$/.test(t))
+    .join("")
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]/g, "");
+}
+
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+
+// 'exact' | 'near'(철자 한 글자 차이) | 'wrong' | 'ime'(한글로 입력됨)
+export function gradeTyping(input, targets) {
+  if (hasHangul(input)) return { result: "ime" };
+  const n = normTyping(input);
+  if (!n) return { result: "wrong" };
+  let near = false;
+  for (const t of targets) {
+    const tn = normTyping(t);
+    if (n === tn) return { result: "exact", answer: t };
+    if (tn.length >= 5 && editDistance(n, tn) <= 1) near = true;
+  }
+  return { result: near ? "near" : "wrong" };
+}
+
+// 표제어(활용형 포함)를 찾는 정규식 — 강조·빈칸 만들기에 공통 사용
+export function headwordRegex(headword) {
+  const prefixes = (headword.match(/[A-Za-z]+/g) || [])
+    .filter((t) => t.length >= 3)
+    .map((t) => (t.length > 5 ? t.slice(0, t.length - 2) : t.length === 5 ? t.slice(0, 4) : t));
+  return prefixes.length ? new RegExp(String.raw`\b(` + prefixes.join("|") + ")[a-z']*", "i") : null;
+}
+
+// 빈칸 문장 만들기: { sentence(영어, 빈칸 ______), answer, hint(한글) } 또는 null
+export function makeCloze(w) {
+  const q = w.quiz;
+  if (q && !q.highlight && q.stem.includes("-------") && q.answer)
+    return { sentence: q.stem.replace("-------", "______"), answer: q.answer, hint: w.meaning };
+  if (q && q.highlight && q.stem.includes(q.highlight))
+    return { sentence: q.stem.replace(q.highlight, "______"), answer: q.highlight, hint: q.translation_kr || w.meaning };
+  const re = headwordRegex(w.headword);
+  if (!re) return null;
+  const pool = [
+    ...(w.colloc || []).slice().sort((a, b) => Number(b.exam) - Number(a.exam)).map((c) => ({ en: c.en, ko: c.ko })),
+    ...(w.dialogue || []).map((d) => ({ en: d.en, ko: d.ko })),
+    ...(w.examples || []).map((x) => ({ en: x.en, ko: x.ko })),
+  ];
+  for (const p of pool) {
+    const m = p.en.match(re);
+    if (m) return { sentence: p.en.replace(m[0], "______"), answer: m[0], hint: p.ko || w.meaning };
+  }
+  return null;
+}
+
+// ======================= 듣기(자동재생) =======================
+// 한 단어를 읽는 순서: [단어(영) → 뜻(한) → 예문(영) → 단어(영)]
+export function exampleSentence(w) {
+  const q = w.quiz;
+  if (q && !q.highlight && q.answer && q.stem.includes("-------")) return q.stem.replace("-------", q.answer);
+  const c = (w.colloc || []).slice().sort((a, b) => Number(b.exam) - Number(a.exam))[0];
+  if (c) return c.en;
+  if (w.dialogue?.length) return w.dialogue[0].en;
+  if (w.examples?.length) return w.examples[0].en;
+  if (q && q.highlight) return q.stem;
+  return null;
+}
+
+export function listenText(w) {
+  const en = typingTargets(w.headword)[0] || w.headword;
+  const ko = String(w.meaning || "").replace(/\s*\/\s*/g, ", ").replace(/[~]/g, "").replace(/\s+/g, " ").trim();
+  return { en, ko };
+}
+
+export function buildListenSteps(w, { example = true, repeatWord = true } = {}) {
+  const { en, ko } = listenText(w);
+  const steps = [{ text: en, lang: "en-US", gap: 0.7 }];
+  if (ko) steps.push({ text: ko, lang: "ko-KR", gap: 0.7 });
+  const ex = example ? exampleSentence(w) : null;
+  if (ex) steps.push({ text: ex, lang: "en-US", gap: 1.0 });
+  if (repeatWord && ex) steps.push({ text: en, lang: "en-US", gap: 0.5 });
+  return steps;
+}

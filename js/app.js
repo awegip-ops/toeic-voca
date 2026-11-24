@@ -7,6 +7,8 @@ import { day, word } from "./views/day.js";
 import { study } from "./views/study.js";
 import { quiz } from "./views/quiz.js";
 import { stats } from "./views/stats.js";
+import { listen } from "./views/listen.js";
+import { typing } from "./views/typing.js";
 
 const routes = [
   [/^#\/?$/, home],
@@ -14,6 +16,8 @@ const routes = [
   [/^#\/word\/([\w-]+)$/, word],
   [/^#\/study\/(review|day-\d+-\d+)(?:\/(\w+))?$/, study],
   [/^#\/quiz\/(day-\d+-\d+)\/(\w+)$/, quiz],
+  [/^#\/listen\/(review|day-\d+-\d+|week-\d+)$/, listen],
+  [/^#\/typing\/(review|day-\d+-\d+)(?:\/(\w+))?$/, typing],
   [/^#\/stats$/, stats],
 ];
 
