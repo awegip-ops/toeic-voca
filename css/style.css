@@ -303,3 +303,7 @@ mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 4px
 .l-stage { min-height: 240px; }
 
 .ai-tag{font-size:.7em;color:var(--muted,#8a8f98);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}
+.t-opts { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.t-step { font-size: 13px; font-weight: 700; color: var(--primary); }
+.t-sent { font-size: 22px; font-weight: 700; line-height: 1.5; }
+.t-input.sent { font-size: 18px; }

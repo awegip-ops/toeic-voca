@@ -156,6 +156,29 @@ export function gradeTyping(input, targets) {
   return { result: near ? "near" : "wrong" };
 }
 
+// 예문을 '쳐야 할 문장'으로 정리: [대체 표기]·(생략 가능 표기)·~ 를 빼고 공백 정리
+export function sentenceTarget(en) {
+  return String(en)
+    .replace(/\[[^\]]*\]/g, "")
+    .replace(/\([^)]*\)/g, "")
+    .replace(/[~]/g, "")
+    .replace(/[가-힣]+/g, "") // 표제어 뒤에 붙은 한글 설명은 칠 수 없으므로 제외
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.?!;:])/g, "$1")
+    .trim();
+}
+
+// 문장 따라쓰기 채점: 대소문자·공백·구두점 무시, 전체 글자 수의 약 4%(최소 1글자)까지의 오타는 'near' 로 인정
+export function gradeSentence(input, target) {
+  if (hasHangul(input)) return { result: "ime" };
+  const n = normTyping(input);
+  const t = normTyping(target);
+  if (!n) return { result: "wrong" };
+  if (n === t) return { result: "exact" };
+  const tol = Math.max(1, Math.floor(t.length * 0.04));
+  return { result: editDistance(n, t) <= tol ? "near" : "wrong" };
+}
+
 // 표제어(활용형 포함)를 찾는 정규식 — 강조·빈칸 만들기에 공통 사용
 export function headwordRegex(headword) {
   const prefixes = (headword.match(/[A-Za-z]+/g) || [])
