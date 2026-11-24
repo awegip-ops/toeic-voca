@@ -1,7 +1,7 @@
 // 오프라인/홈 화면 설치용 서비스 워커: 네트워크 우선 + 캐시 폴백.
 // 온라인이면 항상 최신 파일을 받아 캐시를 갱신하고, 오프라인이면 마지막 캐시로 동작합니다.
 // 파일 이름에 버전 쿼리(?v=)를 붙이지 않으므로, 데이터/코드가 바뀌면 CACHE_VERSION 만 올리면 됩니다.
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v6";
 const CACHE_NAME = `toeic-voca-${CACHE_VERSION}`;
 
 const CORE = [

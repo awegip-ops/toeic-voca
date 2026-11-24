@@ -301,3 +301,5 @@ mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 4px
 .l-exlist li.now-ko .ko { color: var(--primary); font-weight: 700; }
 .l-exlist li.now:not(.now-ko) .en { color: var(--primary); }
 .l-stage { min-height: 240px; }
+
+.ai-tag{font-size:.7em;color:var(--muted,#8a8f98);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}

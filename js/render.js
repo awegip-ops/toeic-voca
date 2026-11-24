@@ -77,7 +77,7 @@ export function wordBody(w, { meaning = true } = {}) {
 export function quizStem(w, answered, q = w.quiz) {
   if (!q) return "";
   if (q.highlight) return `<p class="q-stem">${markHtml(q.stem, q.highlight)}</p>${answered && q.translation_kr ? `<p class="q-tr">${esc(q.translation_kr)}</p>` : ""}`;
-  return `<p class="q-stem">${blankHtml(q.stem, answered ? q.answer : null)}</p>`;
+  return `<p class="q-stem">${blankHtml(q.stem, answered ? q.answer : null)}</p>${answered && q.translation_kr ? `<p class="q-tr">${esc(q.translation_kr)}${q.ai ? ` <small class="ai-tag" title="책에 해석이 없어 따로 번역한 문장입니다">AI 번역</small>` : ""}</p>` : ""}`;
 }
 
 export { sayBtn };

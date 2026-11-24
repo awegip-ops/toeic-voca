@@ -217,7 +217,7 @@ export function listenExamples(w) {
   for (const c of (w.colloc || []).slice().sort((a, b) => Number(b.exam) - Number(a.exam))) add(c.en, c.ko);
   for (const q of w.quizzes || (w.quiz ? [w.quiz] : [])) {
     if (q.highlight) add(q.stem, q.translation_kr);
-    else if (q.answer && q.stem.includes("-------")) add(q.stem.replace("-------", q.answer));
+    else if (q.answer && q.stem.includes("-------")) add(q.stem.replace("-------", q.answer), q.translation_kr);
   }
   for (const d of w.dialogue || []) add(d.en, d.ko);
   for (const x of w.examples || []) add(x.en, x.ko);
